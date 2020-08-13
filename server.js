@@ -3,6 +3,8 @@ const mysql = require("mysql");
 const cTable = require("console.table");
 const inquirer = require("inquirer");
 const Employee = require("./classes/employee");
+const Department = require("./classes/department");
+const Role = require("./classes/role");
 
 let departments =[];
 let empArray = [];
@@ -77,7 +79,7 @@ function start() {
                     {
                         type: "list",
                         message: "What department do they belong to?",
-                        name: "newEmployee",
+                        name: "dept",
                         choices: departments
                     },
                     {
@@ -101,9 +103,9 @@ function start() {
                         name: "salary"
                     }
                 ]).then(response => {
-                    var newEmployee = new Employee(response.firstName, response.lastName, response.title)
+                    var newEmployee = new Employee(response.title, response.firstName, response.lastName, response.dept, response.salary);
                     empArray.push(newEmployee)
-                    console.log(newEmployee);
+                    console.table(empArray);
                 })
                 
             });
