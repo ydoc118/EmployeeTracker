@@ -3,10 +3,10 @@ const mysql = require("mysql");
 const cTable = require("console.table");
 const inquirer = require("inquirer");
 const Employee = require("./classes/employee");
-const Department = require("./classes/department");
 const Role = require("./classes/role");
 
-let departments =[];
+let departments = [];
+let titles = [];
 let empArray = [];
 const questionInit = [
     {
@@ -15,7 +15,7 @@ const questionInit = [
         name: "firstQuestion",
         choices: [
             "Add Employee",
-            "Add title",
+            "Add Title",
             "Add Department",
             "View all Employees",
             "View Employees by Department",
@@ -42,6 +42,24 @@ connection.connect(function(err) {
     console.log("Connected as id " + connection.threadId);
 });
 
+connection.query(`SELECT deptName FROM department`, (err, res) => {
+    if(err) throw err;
+    
+    for(var i = 0; i < res.length; i++){
+        departments.push(res[i].deptName)
+    };
+
+});
+
+connection.query(`SELECT DISTINCT title FROM role`, (err, res) => {
+    if(err) throw err;
+    
+    for(var i = 0; i < res.length; i++){
+        titles.push(res[i].title)
+    };
+
+});
+
 //Function to prefill employee list
 function init() {
     connection.query(`SELECT role.title, employee.last_name, employee.first_name, department.deptName, role.salary
@@ -61,19 +79,13 @@ function init() {
     });
    setTimeout(function(){
        start();
-   }, 500);
+   }, 100);
 };
 
 function start() {
     inquirer.prompt(questionInit)
     .then(response => {
         if(response.firstQuestion === "Add Employee"){
-            connection.query(`SELECT deptName FROM department`, (err, res) => {
-                if(err) throw err;
-                
-                for(var i = 0; i < res.length; i++){
-                    departments.push(res[i].deptName)
-                };
                 
                 inquirer.prompt([
                     {
@@ -83,9 +95,10 @@ function start() {
                         choices: departments
                     },
                     {
-                        type: "input",
+                        type: "list",
                         message: "What is their title?",
-                        name: "title"
+                        name: "title",
+                        choices: titles
                     },
                     {
                         type: "input",
@@ -106,11 +119,25 @@ function start() {
                     var newEmployee = new Employee(response.title, response.firstName, response.lastName, response.dept, response.salary);
                     empArray.push(newEmployee)
                     console.table(empArray);
+                    start();
                 })
-                
-            });
             
-        };
+        }
+        else if(response.firstQuestion === "Add Title") {
+            inquirer.prompt([
+                {
+                    type: "input",
+                    message: "What title would you like to add?",
+                    name: "Title"
+                }
+            ]).then(response => {
+                var newEmpTitle = new Role(response.Title);
+                console.log(newEmpTitle.title)
+                titles.push(newEmpTitle.title)
+                console.table(titles)
+                start();
+            })
+        }
 
 
 
