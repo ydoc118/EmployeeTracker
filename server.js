@@ -2,6 +2,27 @@
 const mysql = require("mysql");
 const cTable = require("console.table");
 const inquirer = require("inquirer");
+const Employee = require("./classes/employee");
+
+let departments =[];
+let empArray = [];
+const questionInit = [
+    {
+        type: "list",
+        message: "What would you like to do?",
+        name: "firstQuestion",
+        choices: [
+            "Add Employee",
+            "Add title",
+            "Add Department",
+            "View all Employees",
+            "View Employees by Department",
+            "View Employees by Role",
+            "Update Employee",
+            "Exit"
+        ]
+    }
+];
 
 
 //Setting up the connection
@@ -20,20 +41,85 @@ connection.connect(function(err) {
 });
 
 //Function to prefill employee list
-function start() {
-    connection.query(`SELECT role.title, employee.first_name, employee.last_name, department.deptName, role.salary
+function init() {
+    connection.query(`SELECT role.title, employee.last_name, employee.first_name, department.deptName, role.salary
         FROM role
         INNER JOIN employee
         ON employee.role_id = role.id
         INNER JOIN department
         ON department.id = role.department_id AND role.id = employee.role_id
         ORDER BY role.id;`, (err, res) => {
-    if(err) throw err;
-    console.table(res);
-});
+        if(err) throw err;
+        
+        for(var i = 0; i < res.length; i++){
+            empArray.push(res[i]); 
+        }
+        console.table(empArray);
+        
+    });
+   setTimeout(function(){
+       start();
+   }, 500);
 };
 
-start();
+function start() {
+    inquirer.prompt(questionInit)
+    .then(response => {
+        if(response.firstQuestion === "Add Employee"){
+            connection.query(`SELECT deptName FROM department`, (err, res) => {
+                if(err) throw err;
+                
+                for(var i = 0; i < res.length; i++){
+                    departments.push(res[i].deptName)
+                };
+                
+                inquirer.prompt([
+                    {
+                        type: "list",
+                        message: "What department do they belong to?",
+                        name: "newEmployee",
+                        choices: departments
+                    },
+                    {
+                        type: "input",
+                        message: "What is their title?",
+                        name: "title"
+                    },
+                    {
+                        type: "input",
+                        message: "What is their first name?",
+                        name: "firstName"
+                    },
+                    {
+                        type: "input",
+                        message: "What is their last name?",
+                        name: "lastName"
+                    },
+                    {
+                        type: "input",
+                        message: "What is their salary?",
+                        name: "salary"
+                    }
+                ]).then(response => {
+                    var newEmployee = new Employee(response.firstName, response.lastName, response.title)
+                    empArray.push(newEmployee)
+                    console.log(newEmployee);
+                })
+                
+            });
+            
+        };
+
+
+
+
+
+
+    })
+}
+
+
+init();
 
 
 
