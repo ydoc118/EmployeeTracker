@@ -6,12 +6,7 @@ class Employee {
         this.deptName = deptName;
         this.salary = salary;
     };
-
-    setNewEmployee() {
-        connection.query("INSERT INTO employee (first_name, last_name) VALUES (?,?)", [this.first_name, this.last_name])
-        connection.query("INSERT INTO department (deptName) VALUES (?)", [this.deptName])
-        connection.query("INSERT INTO role (title, salary) VALUES (?,?)", [this.title, this.salary])
-    };
+   
 };
 
 module.exports = Employee;
