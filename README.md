@@ -23,7 +23,7 @@ To install all necessary dependencies, run the following command:
 
 Run the app in the terminal by using "node server.js" then scroll through the choices
 
-Link to video walkthrough: [Here](https://drive.google.com/file/d/1epUHhgr_Ku_lhKvgMdNkoWcBnS2-XxLl/view)
+Link to video walkthrough: [Here](https://drive.google.com/file/d/1OEGuCszCou2mTf2uqphn6FwwPVbUFHZB/view)
 
 ## License
 
