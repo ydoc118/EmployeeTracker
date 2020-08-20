@@ -21,6 +21,7 @@ const questionInit = [
             "Add Department",
             "View Employees by Department",
             "View Employees by Title",
+            "View All Employees",
             "Exit"
         ]
     }
@@ -74,6 +75,9 @@ function init() {
         ORDER BY role.id;`, (err, res) => {
         if(err) throw err;
         console.table(res);
+        for(var i = 0; i < res.length; i++){
+            empArray.push(res[i]); 
+        }
         
     });
    setTimeout(function(){
@@ -108,6 +112,11 @@ function start() {
                         type: "input",
                         message: "What is their last name?",
                         name: "lastName"
+                    },
+                    {
+                        type: "input",
+                        message: "What is their salary?",
+                        name: "salary"
                     }
                 ]).then(response => {
                     var newEmployee = new Employee(response.title, response.firstName, response.lastName, response.dept, response.salary);
@@ -194,6 +203,10 @@ function start() {
                     start();
                 });
             });
+        }
+        else if(response.firstQuestion === "View All Employees") {
+            console.table(empArray)
+            start();
         }
         else if(response.firstQuestion === "Exit") {
             connection.end();
